@@ -1,0 +1,8 @@
+scipy
+tqdm
+pyyaml
+pyquaternion
+tensorboardX
+tensorboard
+scikit-learn
+open3d
