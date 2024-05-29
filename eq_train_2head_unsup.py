@@ -203,50 +203,50 @@ class Trainer(object):
             for idx_s, sid in enumerate(batch_sid):
                 sid = int(sid)
                 if sid not in self.flow1_dict:
-                    self.flow1_dict[sid] = flows[0][idx_s].detach()
+                    self.flow1_dict[sid] = flows[0][idx_s]
                 if sid not in self.flow2_dict:
-                    self.flow2_dict[sid] = flows[1][idx_s].detach()
+                    self.flow2_dict[sid] = flows[1][idx_s]
                 temporal_ensemble_flow1.append(self.flow1_dict[sid])
                 temporal_ensemble_flow2.append(self.flow2_dict[sid])
-            temporal_ensemble_flow1 = torch.stack(temporal_ensemble_flow1, 0).detach()
-            temporal_ensemble_flow2 = torch.stack(temporal_ensemble_flow2, 0).detach()
+            temporal_ensemble_flow1 = torch.stack(temporal_ensemble_flow1, 0).detach().clone()
+            temporal_ensemble_flow2 = torch.stack(temporal_ensemble_flow2, 0).detach().clone()
             temporal_ensemble_flows = (temporal_ensemble_flow1, temporal_ensemble_flow2)
-            with torch.no_grad():
-                assert(len(flows) == len(masks) == len(pcs) == 2)
-                flow1, flow2 = flows[0], flows[1]
-                input_segm1, input_segm2 = masks[0], masks[1]
-                x1, x2 = pcs[0], pcs[1]
-                flow1_update, R1, t1 = object_aware_icp_with_Rt(x1, x2, temporal_ensemble_flow1,
-                                                                input_segm1, input_segm2,
-                                                                icp_iter=10, temperature=0.01)#FIXME:icp_iter = 20, temperature = 0.01)
-                flow2_update, R2, t2 = object_aware_icp_with_Rt(x2, x1, temporal_ensemble_flow2,
-                                                                input_segm2, input_segm1,
-                                                                icp_iter=10, temperature=0.01)#FIXME:icp_iter = 20, temperature = 0.01)
-                R1 = R1.detach()
-                R2 = R2.detach()
 
-                temporal_ensemble_R1 = []
-                temporal_ensemble_R2 = []
-                for idx_s, sid in enumerate(batch_sid):
-                    sid = int(sid)
-                    if sid not in self.R1_dict:
-                        self.R1_dict[sid] = R1[idx_s].detach()
-                    if sid not in self.R2_dict:
-                        self.R2_dict[sid] = R2[idx_s].detach()
-                    temporal_ensemble_R1.append(self.R1_dict[sid])
-                    temporal_ensemble_R2.append(self.R2_dict[sid])
-                    old_R_weight = 0.9
-                    self.R1_dict[sid] = old_R_weight * self.R1_dict[sid] + (1 - old_R_weight) * R1[idx_s]
-                    self.R2_dict[sid] = old_R_weight * self.R2_dict[sid] + (1 - old_R_weight) * R2[idx_s]
+            if temporal_ensemble_update_flow:
+                with torch.no_grad():
+                    assert(len(flows) == len(masks) == len(pcs) == 2)
+                    flow1, flow2 = flows[0], flows[1]
+                    input_segm1, input_segm2 = masks[0], masks[1]
+                    x1, x2 = pcs[0], pcs[1]
+                    flow1_update, R1, t1 = object_aware_icp_with_Rt(x1, x2, temporal_ensemble_flow1,
+                                                                    input_segm1, input_segm2,
+                                                                    icp_iter = 20, temperature = 0.01)
+                    flow2_update, R2, t2 = object_aware_icp_with_Rt(x2, x1, temporal_ensemble_flow2,
+                                                                    input_segm2, input_segm1,
+                                                                    icp_iter = 20, temperature = 0.01)
+                    R1 = R1.detach()
+                    R2 = R2.detach()
 
-                    if temporal_ensemble_update_flow:
+                    temporal_ensemble_R1 = []
+                    temporal_ensemble_R2 = []
+                    for idx_s, sid in enumerate(batch_sid):
+                        sid = int(sid)
+                        if sid not in self.R1_dict:
+                            self.R1_dict[sid] = R1[idx_s].detach()
+                        if sid not in self.R2_dict:
+                            self.R2_dict[sid] = R2[idx_s].detach()
+                        temporal_ensemble_R1.append(self.R1_dict[sid])
+                        temporal_ensemble_R2.append(self.R2_dict[sid])
+                        old_R_weight = 0.9
+                        self.R1_dict[sid] = old_R_weight * self.R1_dict[sid] + (1 - old_R_weight) * R1[idx_s]
+                        self.R2_dict[sid] = old_R_weight * self.R2_dict[sid] + (1 - old_R_weight) * R2[idx_s]
                         old_flow_weight = 0.9
                         self.flow1_dict[sid] = old_flow_weight * self.flow1_dict[sid] + (1 - old_flow_weight) * flow1_update[idx_s]
                         self.flow2_dict[sid] = old_flow_weight * self.flow2_dict[sid] + (1 - old_flow_weight) * flow2_update[idx_s]
 
-                temporal_ensemble_R1 = torch.stack(temporal_ensemble_R1, 0).detach()
-                temporal_ensemble_R2 = torch.stack(temporal_ensemble_R2, 0).detach()
-                temporal_ensemble_R = (temporal_ensemble_R1 + temporal_ensemble_R2.transpose(-1, -2)) / 2
+                    temporal_ensemble_R1 = torch.stack(temporal_ensemble_R1, 0).detach()
+                    temporal_ensemble_R2 = torch.stack(temporal_ensemble_R2, 0).detach()
+                    temporal_ensemble_R = (temporal_ensemble_R1 + temporal_ensemble_R2.transpose(-1, -2)) / 2
 
             if not training_seg:
                 with torch.no_grad():
@@ -283,14 +283,14 @@ class Trainer(object):
                         mask1_weight = mask_weighting_based_on_R_all(x1.detach(), x2.detach(),
                                                                      temporal_ensemble_flow1.detach(),
                                                                      input_segm1.detach(), input_segm2.detach(),
-                                                                     R_all=pred_R_all,#)
+                                                                     R_all=pred_R_all.detach(),#)
                                                                      exp_factor=0.5 if args.dataset == 'ogcdr' else 2.0,
                                                                      res_ignore = 5 if args.dataset == 'ogcdr' else 1e-5)
 
                         mask2_weight = mask_weighting_based_on_R_all(x2.detach(), x1.detach(),
                                                                      temporal_ensemble_flow2.detach(),
                                                                      input_segm2.detach(), input_segm1.detach(),
-                                                                     R_all=pred_R_all.transpose(-1, -2), #)
+                                                                     R_all=pred_R_all.transpose(-1, -2).detach(), #)
                                                                      exp_factor=0.5 if args.dataset == 'ogcdr' else 2.0,
                                                                      res_ignore=5 if args.dataset == 'ogcdr' else 1e-5)
 
