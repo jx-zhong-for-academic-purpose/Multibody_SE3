@@ -67,7 +67,7 @@ Download the necessary datasets from the following links and place them in your 
 Download the checkpoint for the self-supervised scene flow network from [OGC](https://github.com/vLAR-group/OGC):
 - **Checkpoint (`sapien_unsup`)**: [Dropbox](https://www.dropbox.com/s/k4hv71952i0yrye/OGC_ckpt.zip?dl=0&e=1&file_subpath=%2Fckpt%2Fflow%2Fsapien%2Fsapien_unsup%2Fbest.pth.tar).
 
-In our experiments, we directly use the **same** trained model as theirs for fair comparisons. 
+In our experiments, we directly use the **same** trained model as their scene flow network for fair comparisons. 
 If needed, the scene flow network can be trained and tested as follows:
 ### Training
 
