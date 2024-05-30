@@ -212,7 +212,7 @@ class Trainer(object):
             temporal_ensemble_flow2 = torch.stack(temporal_ensemble_flow2, 0).detach().clone()
             temporal_ensemble_flows = (temporal_ensemble_flow1, temporal_ensemble_flow2)
 
-            if temporal_ensemble_update_flow:
+            if (not training_seg) or temporal_ensemble_update_flow:
                 with torch.no_grad():
                     assert(len(flows) == len(masks) == len(pcs) == 2)
                     flow1, flow2 = flows[0], flows[1]
