@@ -55,9 +55,9 @@ If our work has been helpful in your research, please consider citing it as foll
 
 ## 2. Data Preparation
 
-### SAPIEN Dataset
+### SAPIEN Dataset (Provided by [MBS](https://github.com/huangjh-pub/multibody-sync))
 
-Download the necessary datasets from the following links and place them in your specified `${SAPIEN}` directory:
+Download necessary data from the following links and place them in your specified `${SAPIEN}` directory:
 
 - **Training + Validation Set (`mbs-shapepart`)**: [Google Drive](https://drive.google.com/file/d/1aGTn-PYxLjnhj9UKlv4YFV3Mt1E3ftci/view?usp=sharing)
 - **Test Set (`mbs-sapien`)**: [Google Drive](https://drive.google.com/file/d/1HR2X0DjgXLwp8K5n2nsvfGTcDMSckX5Z/view?usp=sharing)
