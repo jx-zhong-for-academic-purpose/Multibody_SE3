@@ -8,7 +8,7 @@ If our work has been helpful in your research, please consider citing it as foll
 
 ```
 @inproceedings{zhong2023multi,
-  title={Multi-body SE(3) Equivariance for Unsupervised Rigid Segmentation and Motion Estimation},
+  title={Multi-body SE (3) Equivariance for Unsupervised Rigid Segmentation and Motion Estimation},
   author={Zhong, Jia-Xing and Cheng, Ta-Ying and He, Yuhang and Lu, Kai and Zhou, Kaichen and Markham, Andrew and Trigoni, Niki},
   booktitle={Thirty-seventh Conference on Neural Information Processing Systems},
   year={2023}
