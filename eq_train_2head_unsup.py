@@ -203,9 +203,9 @@ class Trainer(object):
             for idx_s, sid in enumerate(batch_sid):
                 sid = int(sid)
                 if sid not in self.flow1_dict:
-                    self.flow1_dict[sid] = flows[0][idx_s]
+                    self.flow1_dict[sid] = flows[0][idx_s].detach().clone()
                 if sid not in self.flow2_dict:
-                    self.flow2_dict[sid] = flows[1][idx_s]
+                    self.flow2_dict[sid] = flows[1][idx_s].detach().clone()
                 temporal_ensemble_flow1.append(self.flow1_dict[sid])
                 temporal_ensemble_flow2.append(self.flow2_dict[sid])
             temporal_ensemble_flow1 = torch.stack(temporal_ensemble_flow1, 0).detach().clone()
